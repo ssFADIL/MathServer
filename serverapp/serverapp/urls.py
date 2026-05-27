@@ -20,6 +20,5 @@ from mathapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('areaofrectangle/', views.rectarea, name="areaofrectangle"),
-    path('', views.rectarea, name="areaofrectangleroot")
+    path('',views.gst_amt_calc, name='gst_amt')
 ]

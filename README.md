@@ -45,74 +45,34 @@ Publish the website in Localhost.
 ## PROGRAM:
 math.html
 ```
-<!DOCTYPE html>
+*Template HTML:*
 <html>
 <head>
-    <title>Area Calculator</title>
-    <style>
-        body {
-            font-size: 20px;
-            background-color: blue;
-            color: white;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-        .edge {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .box {
-            background-color: rgba(0, 0, 0, 0.35);
-            padding: 24px;
-            border-radius: 12px;
-            width: 320px;
-            box-shadow: 0 0 16px rgba(0, 0, 0, 0.35);
-        }
-        .formelt {
-            color: orange;
-            text-align: center;
-            margin-top: 7px;
-            margin-bottom: 6px;
-        }
-        h1 {
-            color: rgb(255, 0, 179);
-            text-align: center;
-            padding-top: 20px;
-            margin-bottom: 24px;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-    </style>
+    <title>GST Calculator</title>
 </head>
 <body>
-    <div class="edge">
-        <div class="box">
-            <h1>Area of a Rectangle</h1>
-            <form method="POST">
-                {% csrf_token %}
-                <div class="formelt">
-                    Length : <input type="text" name="length" value="{{l}}">(in m)<br/>
-                </div>
-                <div class="formelt">
-                    Breadth : <input type="text" name="breadth" value="{{b}}">(in m)<br/>
-                </div>
-                <div class="formelt">
-                    <input type="submit" value="Calculate"><br/>
-                </div>
-                <div class="formelt">
-                    Area : <input type="text" name="area" value="{{area}}" readonly>m<sup>2</sup><br/>
-                </div>
-            </form>
-        </div>
-    </div>
+
+    <form method="post">
+    <h2>GST Calculator</h2>
+
+        {% csrf_token %}
+        <label for="price">Price :</label>
+        <input type="text" name="price" required><br><br>
+
+        <label for="gst">GST (%):</label>
+        <input type="text" name="gst" required><br><br>
+
+        <button type="submit">Calculate</button>
+    </form>
+
+    {% if gst_amt is not None %}
+        <h2>Result:</h2>
+        {% if "Error" in gst_amt|stringformat:"s" %}
+            <p style="color: red;">{{ gst_amt }}</p>
+        {% else %}
+            <p>GST: {{ gst_amt|stringformat:".2f" }}</p>
+        {% endif %}
+    {% endif %}
 </body>
 </html>
 ```
@@ -120,23 +80,22 @@ view.py
 ```
 from django.shortcuts import render
 
-def rectarea(request):
-    context = {}
-    context['area'] = "0"
-    context['l'] = "0"
-    context['b'] = "0"
+def gst_amt_calc(request):
+    gst_amt = None
     if request.method == 'POST':
-        print("POST method is used")
-        l = request.POST.get('length','0')
-        b = request.POST.get('breadth','0')
-        print('request=', request)
-        print('Length=', l)
-        print('Breadth=', b)
-        area = int(l) * int(b)
-        context['area'] = area
-        context['l'] = l
-        context['b'] = b
-        print('Area=', area)
+        try:
+            price = float(request.POST.get('price'))
+            gst = float(request.POST.get('gst'))
+           
+            if price >= 0 and gst >= 0:
+                gst_amt = price + ((price * gst) / 100)
+            else:
+                gst_amt = "Error: Inputs cannot be negative."
+        except ValueError:
+            gst_amt = "Error: Invalid input. Please enter numeric values."
+    context = {
+        'gst_amt': gst_amt
+    }
     return render(request, 'mathapp/math.html', context)
 ```
 urls.py
@@ -147,19 +106,18 @@ from mathapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('areaofrectangle/', views.rectarea, name="areaofrectangle"),
-    path('', views.rectarea, name="areaofrectangleroot")
+    path('',views.gst_amt_calc, name='gst_amt')
 ]
 ```
 
-
 ## OUTPUT - SERVER SIDE:
 
-![alt text](serverside.png)
+![alt text](1.png)
 
 ## OUTPUT - WEBPAGE:
 
-![alt text](webpage.png)
+![alt text](2.png)
+
 
 ## RESULT:
 The a web page to calculate total bill amount with GST from price and GST percentage using server-side scripts is created successfully.

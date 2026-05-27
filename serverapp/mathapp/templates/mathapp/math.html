@@ -1,70 +1,30 @@
-<!DOCTYPE html>
+*Template HTML:*
 <html>
 <head>
-    <title>Area Calculator</title>
-    <style>
-        body {
-            font-size: 20px;
-            background-color: blue;
-            color: white;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-        .edge {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .box {
-            background-color: rgba(0, 0, 0, 0.35);
-            padding: 24px;
-            border-radius: 12px;
-            width: 320px;
-            box-shadow: 0 0 16px rgba(0, 0, 0, 0.35);
-        }
-        .formelt {
-            color: orange;
-            text-align: center;
-            margin-top: 7px;
-            margin-bottom: 6px;
-        }
-        h1 {
-            color: rgb(255, 0, 179);
-            text-align: center;
-            padding-top: 20px;
-            margin-bottom: 24px;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-    </style>
+    <title>GST Calculator</title>
 </head>
 <body>
-    <div class="edge">
-        <div class="box">
-            <h1>Area of a Rectangle</h1>
-            <form method="POST">
-                {% csrf_token %}
-                <div class="formelt">
-                    Length : <input type="text" name="length" value="{{l}}">(in m)<br/>
-                </div>
-                <div class="formelt">
-                    Breadth : <input type="text" name="breadth" value="{{b}}">(in m)<br/>
-                </div>
-                <div class="formelt">
-                    <input type="submit" value="Calculate"><br/>
-                </div>
-                <div class="formelt">
-                    Area : <input type="text" name="area" value="{{area}}" readonly>m<sup>2</sup><br/>
-                </div>
-            </form>
-        </div>
-    </div>
+
+    <form method="post">
+    <h2>GST Calculator</h2>
+
+        {% csrf_token %}
+        <label for="price">Price :</label>
+        <input type="text" name="price" required><br><br>
+
+        <label for="gst">GST (%):</label>
+        <input type="text" name="gst" required><br><br>
+
+        <button type="submit">Calculate</button>
+    </form>
+
+    {% if gst_amt is not None %}
+        <h2>Result:</h2>
+        {% if "Error" in gst_amt|stringformat:"s" %}
+            <p style="color: red;">{{ gst_amt }}</p>
+        {% else %}
+            <p>GST: {{ gst_amt|stringformat:".2f" }}</p>
+        {% endif %}
+    {% endif %}
 </body>
 </html>
